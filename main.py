@@ -2,7 +2,7 @@ from settings import *
 from wrestler import *
 from game import Game
 
-init_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Sumo Physics AI")
+init_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Single Player Sumo AI")
 set_target_fps(FPS)
 
 players = [AgenticWrestler() for _ in range(5)]

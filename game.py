@@ -11,83 +11,72 @@ class Game(Circle):
 		super().__init__(x, y, radius, BLUE)
 
 		self.players = players
+		self.opponent = DummyWrestler(self.pos.x, self.pos.y)
 		# i => player1, j => player2
 		self.generation = 1
 		self.i = 0
-		self.j = 1
 		self.timer = 0
 
 		self.players[self.i].pos = self.pos - Vector(100, 0)
-		self.players[self.j].pos = self.pos + Vector(100, 0)
+		self.opponent.pos = self.pos + Vector(0, 0)
 
 	def next_match(self):
 		# setting up players
-		if self.i + 2 >= len(self.players) and self.j + 1 >= len(self.players):
+		if self.i + 1 >= len(self.players):
 			self.next_gen()
-		elif self.j + 1 >= len(self.players):
-			self.i += 1
-			self.j = self.i + 1
 		else:
-			self.j += 1
+			self.i += 1
 
 		self.players[self.i].pos = self.pos - Vector(100, 0)
-		self.players[self.j].pos = self.pos + Vector(100, 0)
+		self.opponent.pos = self.pos + Vector(0, 0)
 		self.players[self.i].vel = Vector(0,0)
 		self.players[self.i].acc = Vector(0,0)
 
-		self.players[self.j].vel = Vector(0,0)
-		self.players[self.j].acc = Vector(0,0)
+		self.opponent.vel = Vector(0,0)
+		self.opponent.acc = Vector(0,0)
 
 			
 
 
 	def update(self):
-		[i,j] = [self.i, self.j]
-		if not (self.players[i] and self.players[j]):
-			print(len(self.players), i, j)
-			raise "Player indices not available"
+		i = self.i
 		
-		self.players[i].opponent = self.players[j]
-		self.players[j].opponent = self.players[i]
+		self.players[i].opponent = self.opponent
 		self.players[i].update()
-		self.players[j].update()
+		self.opponent.update()
 		if self.check_gameover():
 			self.next_match()
 
-		if check_collision(self.players[i], self.players[j]):
+		if check_collision(self.players[i], self.opponent):
 			# reward impact
-			normal = (self.players[j].pos - self.players[i].pos).unit()
-			relative_vel = self.players[j].vel - self.players[i].vel
+			normal = (self.opponent.pos - self.players[i].pos).unit()
+			relative_vel = self.opponent.vel - self.players[i].vel
 			impact = Vector.dot(relative_vel, normal)
 			self.players[i].score += max(impact, 0) * 2
-			self.players[j].score += min(-impact, 0) * 2
+			self.opponent.score += min(-impact, 0) * 2
 
-			resolve_penetration(self.players[i], self.players[j])
-			collision_resolution(self.players[i], self.players[j])
+			resolve_penetration(self.players[i], self.opponent)
+			collision_resolution(self.players[i], self.opponent)
 		
 		self.timer += 1
 
 	def check_gameover(self):
-		[i,j] = [self.i, self.j]
+		i = self.i
 		player1_out = (self.pos - self.players[i].pos).mag() > self.radius-self.border - self.players[i].radius
-		player2_out = (self.pos - self.players[j].pos).mag() > self.radius-self.border - self.players[j].radius
+		player2_out = (self.pos - self.opponent.pos).mag() > self.radius-self.border - self.opponent.radius
 		if player1_out or player2_out or self.timer % (FPS*2)==0:
 			if player2_out and not player1_out:
 				self.players[i].score += 1000
-				self.players[j].score -= 1000
 			if player1_out and not player2_out:
 				self.players[i].score -= 1000
-				self.players[j].score += 1000
 
 			if self.timer % (FPS*2) == 0:
 				self_dist = (self.players[i].pos - self.pos).mag()
-				opp_dist = (self.players[j].pos - self.pos).mag()
+				opp_dist = (self.opponent.pos - self.pos).mag()
 				if self_dist < opp_dist:
 					self.players[i].score += 20
-					self.players[j].score -= 20
 				else:
 					self.players[i].score -= 20
-					self.players[j].score += 20
 					
 
 			self.timer = 0
@@ -109,16 +98,14 @@ class Game(Circle):
 		self.players += topk
 		self.generation += 1
 		self.i = 0
-		self.j = 1
-
 
 	def draw(self):
 		super().draw()
 		self.players[self.i].draw(self.i)
-		self.players[self.j].draw(self.j)
+		self.opponent.draw("Op")
 
 	def draw_status(self):
 		draw_text(f"Generation: {self.generation}", 20, 20, 20, WHITE)
 		draw_text(f"Player Count: {len(self.players)}", 20, 40, 20, WHITE)
-		draw_text(f"Player {self.i} vs {self.j}", 20, 60, 20, WHITE)
+		draw_text(f"Player {self.i}", 20, 60, 20, WHITE)
 		draw_fps(20,200)
