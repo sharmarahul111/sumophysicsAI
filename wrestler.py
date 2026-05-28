@@ -72,6 +72,14 @@ class AgenticWrestler(Wrestler):
 
 		self.keys = (result >= self.thrashold).astype(int)
 
+	def mutate(self, copies, diversity):
+		agents = []
+		for i in range(copies):
+			agent = AgenticWrestler()
+			agent.network.mutate(diversity)
+			agents.append(agent)
+		return agents
+
 def check_collision(w1: Wrestler, w2: Wrestler):
 	dist = (w1.pos - w2.pos).mag()
 	if w1.radius + w2.radius > dist:
