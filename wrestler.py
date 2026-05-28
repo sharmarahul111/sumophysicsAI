@@ -8,8 +8,8 @@ class Wrestler(Circle):
 		self.vel = Vector(0, 0)
 		self.acc = Vector(0, 0)
 		self.border = .1 # drawing border
-		self.accelaration = 1
-		self.friction = .1
+		self.accelaration = 2
+		self.friction = .08
 		self.keys = [0,0,0,0] # left/right/up/down
 
 	def control(self):
@@ -56,3 +56,11 @@ def resolve_penetration(w1: Wrestler, w2: Wrestler):
 	penetration_resolution = dist.unit()*(penetration_depth/2)
 	w1.pos += penetration_resolution
 	w2.pos -= penetration_resolution
+
+def collision_resolution(w1: Wrestler, w2: Wrestler):
+	normal = (w1.pos - w2.pos).unit()
+	relative_vel = w1.vel - w2.vel
+	# separating velocity - relVel projected onto the collision normal vector
+	separating_vel = Vector.dot(relative_vel, normal)
+	w1.vel -= normal * separating_vel
+	w2.vel += normal * separating_vel
