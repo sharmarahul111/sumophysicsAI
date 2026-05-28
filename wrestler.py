@@ -19,7 +19,7 @@ class Wrestler(Circle):
 
 	def control(self):
 		if is_key_down(KEY_LEFT):
-			self.keys[0] = -1
+			self.keys[0] = 1
 		else:
 			self.keys[0] = 0
 
@@ -29,7 +29,7 @@ class Wrestler(Circle):
 			self.keys[1] = 0
 
 		if is_key_down(KEY_UP):
-			self.keys[2] = -1
+			self.keys[2] = 1
 		else:
 			self.keys[2] = 0
 
@@ -41,8 +41,8 @@ class Wrestler(Circle):
 
 	def update(self):
 		self.control() # get controls
-		self.acc.x = (self.keys[0] + self.keys[1])*self.accelaration
-		self.acc.y = (self.keys[2] + self.keys[3])*self.accelaration
+		self.acc.x = (self.keys[1] - self.keys[0])*self.accelaration
+		self.acc.y = (self.keys[3] - self.keys[2])*self.accelaration
 		self.vel += self.acc
 		self.vel *= 1-self.friction
 		self.pos += self.vel
@@ -54,11 +54,12 @@ class DummyWrestler(Wrestler):
 class AgenticWrestler(Wrestler):
 	def __init__(self, x=0, y=0):
 		super().__init__(x, y)
-		self.network = Network(8, 16, 16 , 4)
+		self.network = Network(8, 10 , 4)
 		self.opponent: AgenticWrestler = None
 		self.thrashold = .5
 	
 	def control(self):
+		noise = np.random.normal(0, 0.01, 8)
 		x1 = self.pos.x - WINDOW_WIDTH/2
 		y1 = self.pos.y - WINDOW_HEIGHT/2
 		if self.opponent:
@@ -71,24 +72,40 @@ class AgenticWrestler(Wrestler):
 			y2 = WINDOW_HEIGHT/2
 			vx, vy = 0, 0
 		result = self.network.forward(np.array([
-			# math.hypot(x1, y1), math.hypot(x2 - x1, y2 - y1)
-			x1,
-			y1,
+			x1/WINDOW_WIDTH,
+			y1/WINDOW_HEIGHT,
 			(x2-x1)/WINDOW_WIDTH,
 			(y2-y1)/WINDOW_HEIGHT,
-			self.vel.x/100,
-			self.vel.y/100,
-			vx/100,
-			vy/100
-		]))
+			self.vel.x/40,
+			self.vel.y/40,
+			vx/40,
+			vy/40
+		] + noise))
 
-		opp_dist = (self.pos - self.opponent.pos).mag()
-		self.score += opp_dist * 0.01
+		# reward self being closer to center and punish for opponent being closer to center
+		center = Vector(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
+		self_dist = (self.pos - center).mag()
+		opp_dist = (self.opponent.pos - center).mag()
+		self.score += (opp_dist - self_dist) * 0.01
 
-		# print(math.hypot(x1, y1), math.hypot(x2 - x1, y2 - y1))
-		self.keys = (result >= self.thrashold).astype(int)
-		self.keys[0] *= -1
-		self.keys[2] *= -1
+		# reward forward pressure
+		to_opp = (self.opponent.pos - self.pos).unit()
+		pressure = Vector.dot(self.vel, to_opp)
+		self.score += pressure * 0.05
+
+		# reward impact
+		normal = (self.opponent.pos - self.pos).unit()
+		relative_vel = self.vel - self.opponent.vel
+		impact = Vector.dot(relative_vel, normal)
+		self.score += max(impact, 0) * 2
+		
+		# penalty for idling
+		if self.vel.mag() < 0.2:
+			self.score -= 0.05
+
+		self.keys = result*10 + .3
+
+
 
 	def mutate(self, copies, diversity):
 		agents = []
@@ -115,5 +132,7 @@ def collision_resolution(w1: Wrestler, w2: Wrestler):
 	relative_vel = w1.vel - w2.vel
 	# separating velocity - relVel projected onto the collision normal vector
 	separating_vel = Vector.dot(relative_vel, normal)
-	w1.vel -= normal * separating_vel
-	w2.vel += normal * separating_vel
+	impulse = normal * separating_vel
+
+	w1.vel -= impulse
+	w2.vel += impulse

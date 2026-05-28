@@ -64,17 +64,24 @@ class Game(Circle):
 		[i,j] = [self.i, self.j]
 		player1_out = (self.pos - self.players[i].pos).mag() > self.radius-self.border - self.players[i].radius
 		player2_out = (self.pos - self.players[j].pos).mag() > self.radius-self.border - self.players[j].radius
-		if player1_out or player2_out or self.timer % (80*5)==0:
+		if player1_out or player2_out or self.timer % (FPS)==0:
 			if player2_out and not player1_out:
-				self.players[i].score += 10
-				self.players[j].score -= 10
+				self.players[i].score += 100
+				self.players[j].score -= 100
 			if player1_out and not player2_out:
-				self.players[i].score -= 10
-				self.players[j].score += 10
+				self.players[i].score -= 100
+				self.players[j].score += 100
 
-			if self.timer % (80*5) == 0:
-				self.players[i].score -= 50
-				self.players[j].score -= 50
+			if self.timer % (FPS) == 0:
+				self_dist = (self.players[i].pos - self.pos).mag()
+				opp_dist = (self.players[j].pos - self.pos).mag()
+				if self_dist < opp_dist:
+					self.players[i].score += 20
+					self.players[j].score -= 20
+				else:
+					self.players[i].score -= 20
+					self.players[j].score += 20
+					
 
 			self.timer = 0
 			return True
@@ -86,7 +93,7 @@ class Game(Circle):
 		self.players = []
 		for player in topk:
 			self.players += player.mutate(4, diversity=.05)
-			# self.players += player.mutate(2, diversity=.2)
+			self.players += player.mutate(1, diversity=.2)
 			self.players += [AgenticWrestler() for _ in range(1)]
 		self.players += topk
 		self.generation += 1
@@ -103,3 +110,4 @@ class Game(Circle):
 		draw_text(f"Generation: {self.generation}", 20, 20, 20, WHITE)
 		draw_text(f"Player Count: {len(self.players)}", 20, 40, 20, WHITE)
 		draw_text(f"Player {self.i} vs {self.j}", 20, 60, 20, WHITE)
+		draw_fps(20,200)
