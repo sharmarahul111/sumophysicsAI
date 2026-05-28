@@ -7,3 +7,36 @@ class Wrestler(Circle):
 		super().__init__(x, y, radius, YELLOW)
 		self.vel = Vector(0, 0)
 		self.acc = Vector(0, 0)
+		self.accelaration = 1
+		self.friction = .1
+		self.keys = [0,0,0,0] # left/right/up/down
+
+	def control(self):
+		if is_key_down(KEY_LEFT):
+			self.keys[0] = -1
+		else:
+			self.keys[0] = 0
+
+		if is_key_down(KEY_RIGHT):
+			self.keys[1] = 1
+		else:
+			self.keys[1] = 0
+
+		if is_key_down(KEY_UP):
+			self.keys[2] = -1
+		else:
+			self.keys[2] = 0
+
+		if is_key_down(KEY_DOWN):
+			self.keys[3] = 1
+		else:
+			self.keys[3] = 0
+
+
+	def update(self):
+		self.control() # get controls
+		self.acc.x = self.keys[0] + self.keys[1]
+		self.acc.y = self.keys[2] + self.keys[3]
+		self.vel += self.acc
+		self.vel *= 1-self.friction
+		self.pos += self.vel

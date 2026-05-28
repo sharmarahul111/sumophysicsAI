@@ -9,6 +9,7 @@ game = Game()
 wrestler = Wrestler(300, 400, 50)
 
 while not window_should_close():
+	wrestler.update()
 	begin_drawing()
 	clear_background((55, 55, 55))
 	game.draw()
