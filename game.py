@@ -1,6 +1,7 @@
 from settings import *
 from circle import Circle
 from wrestler import *
+from random import random
 
 class Game(Circle):
 	def __init__(self, players: Wrestler):
@@ -27,7 +28,9 @@ class Game(Circle):
 		else:
 			self.i += 1
 
-		self.players[self.i].pos = self.pos - Vector(100, 0)
+		# randomize spawn
+		random_dir = (Vector(random(),random())*2 - Vector(1,1)).unit()
+		self.players[self.i].pos = self.pos + (random_dir * 150)
 		self.opponent.pos = self.pos + Vector(0, 0)
 		self.players[self.i].vel = Vector(0,0)
 		self.players[self.i].acc = Vector(0,0)
@@ -85,7 +88,7 @@ class Game(Circle):
 			return False
 
 	def next_gen(self):
-		topk: list[AgenticWrestler] = sorted(self.players, key=lambda player: player.score, reverse=True)[:4]
+		topk: list[AgenticWrestler] = sorted(self.players, key=lambda player: player.score, reverse=True)[:2]
 		for top in topk:
 			# resetting scores
 			top.score = 0
