@@ -12,8 +12,8 @@ class Wrestler(Circle):
 		self.acc = Vector(0, 0)
 		self.border = .1 # drawing border
 		self.score = 0
-		self.accelaration = .1
-		self.friction = .08
+		self.accelaration = .5
+		self.friction = .03
 		self.keys = [0,0,0,0] # left/right/up/down
 
 	def control(self):

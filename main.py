@@ -5,7 +5,7 @@ from game import Game
 init_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Sumo Physics AI")
 set_target_fps(360)
 
-players = [AgenticWrestler() for _ in range(2)]
+players = [AgenticWrestler() for _ in range(5)]
 
 game = Game(players)
 
