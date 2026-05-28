@@ -7,7 +7,7 @@ set_target_fps(60)
 
 game = Game()
 wrestler1 = Wrestler(400, 400, 50)
-wrestler2 = DummyWrestler(600, 400, 50)
+wrestler2 = AgenticWrestler(600, 400, 50)
 
 while not window_should_close():
 	wrestler1.update()

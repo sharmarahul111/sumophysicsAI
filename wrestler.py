@@ -1,6 +1,8 @@
 from settings import *
 from circle import Circle
 from vector import Vector
+from network import Network
+import numpy as np
 
 class Wrestler(Circle):
 	def __init__(self, x, y, radius):
@@ -8,7 +10,7 @@ class Wrestler(Circle):
 		self.vel = Vector(0, 0)
 		self.acc = Vector(0, 0)
 		self.border = .1 # drawing border
-		self.accelaration = 2
+		self.accelaration = 1
 		self.friction = .08
 		self.keys = [0,0,0,0] # left/right/up/down
 
@@ -45,6 +47,31 @@ class Wrestler(Circle):
 class DummyWrestler(Wrestler):
 	def control(self):
 		pass
+
+class AgenticWrestler(Wrestler):
+	def __init__(self, x, y, radius):
+		super().__init__(x, y, radius)
+		self.network = Network(4, 4 , 4)
+		self.opponent: AgenticWrestler = None
+		self.thrashold = .5
+	
+	def control(self):
+		x1 = self.pos.x - WINDOW_WIDTH/2
+		y1 = self.pos.y - WINDOW_HEIGHT/2
+		if self.opponent:
+			x2 = self.opponent.pos.x - WINDOW_WIDTH/2
+			y2 = self.opponent.pos.y - WINDOW_HEIGHT/2
+		else:
+			x2 = WINDOW_WIDTH/2
+			y2 = WINDOW_HEIGHT/2
+		result = self.network.forward(np.array([
+			x1, y1, x2, y2
+		]))
+
+		self.keys = (result >= self.thrashold).astype(int)
+		print(result)
+		print(self.keys)
+
 def check_collision(w1: Wrestler, w2: Wrestler):
 	dist = (w1.pos - w2.pos).mag()
 	if w1.radius + w2.radius > dist:
