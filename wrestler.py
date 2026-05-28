@@ -7,6 +7,7 @@ class Wrestler(Circle):
 		super().__init__(x, y, radius, YELLOW)
 		self.vel = Vector(0, 0)
 		self.acc = Vector(0, 0)
+		self.border = .1 # drawing border
 		self.accelaration = 1
 		self.friction = .1
 		self.keys = [0,0,0,0] # left/right/up/down

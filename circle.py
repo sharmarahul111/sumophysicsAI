@@ -5,7 +5,8 @@ class Circle:
 		self.pos = Vector(x, y)
 		self.radius = radius
 		self.color = color
+		self.border = .05
 
 	def draw(self):
-		draw_circle(int(self.pos.x), int(self.pos.y), self.radius*1.05, BLACK)
-		draw_circle(int(self.pos.x), int(self.pos.y), self.radius, self.color)
+		draw_circle(int(self.pos.x), int(self.pos.y), self.radius, BLACK)
+		draw_circle(int(self.pos.x), int(self.pos.y), self.radius*(1-self.border), self.color)
