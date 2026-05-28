@@ -14,7 +14,7 @@ class Wrestler(Circle):
 		self.border = .1 # drawing border
 		self.score = 0
 		self.accelaration = 2
-		self.friction = .015
+		self.friction = .018
 		self.keys = [0,0,0,0] # left/right/up/down
 
 	def control(self):
@@ -87,13 +87,17 @@ class AgenticWrestler(Wrestler):
 		center = Vector(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
 		self_dist = (self.pos - center).mag()
 		opp_dist = (self.opponent.pos - center).mag()
-		self.score += (opp_dist - self_dist) * 0.01
+		self.score += (opp_dist - self_dist) * 0.03
 
 		# reward forward pressure
 		to_opp = (self.opponent.pos - self.pos).unit()
 		pressure = Vector.dot(self.vel, to_opp)
 		self.score += pressure * 0.05
 
+		# penalty for spiraling
+		tangent = to_opp.normal()
+		orbiting = abs(Vector.dot(self.vel, tangent))
+		self.score -= orbiting * 0.03
 		
 		# penalty for idling
 		if self.vel.mag() < 0.2:
