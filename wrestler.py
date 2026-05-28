@@ -3,6 +3,7 @@ from circle import Circle
 from vector import Vector
 from network import Network
 import numpy as np
+import math
 
 
 class Wrestler(Circle):
@@ -53,7 +54,7 @@ class DummyWrestler(Wrestler):
 class AgenticWrestler(Wrestler):
 	def __init__(self, x=0, y=0):
 		super().__init__(x, y)
-		self.network = Network(4, 4 , 4)
+		self.network = Network(8, 16, 16 , 4)
 		self.opponent: AgenticWrestler = None
 		self.thrashold = .5
 	
@@ -63,20 +64,37 @@ class AgenticWrestler(Wrestler):
 		if self.opponent:
 			x2 = self.opponent.pos.x - WINDOW_WIDTH/2
 			y2 = self.opponent.pos.y - WINDOW_HEIGHT/2
+			vx = self.opponent.vel.x
+			vy = self.opponent.vel.y
 		else:
 			x2 = WINDOW_WIDTH/2
 			y2 = WINDOW_HEIGHT/2
+			vx, vy = 0, 0
 		result = self.network.forward(np.array([
-			x1, y1, x2, y2
+			# math.hypot(x1, y1), math.hypot(x2 - x1, y2 - y1)
+			x1,
+			y1,
+			(x2-x1)/WINDOW_WIDTH,
+			(y2-y1)/WINDOW_HEIGHT,
+			self.vel.x/100,
+			self.vel.y/100,
+			vx/100,
+			vy/100
 		]))
 
+		opp_dist = (self.pos - self.opponent.pos).mag()
+		self.score += opp_dist * 0.01
+
+		# print(math.hypot(x1, y1), math.hypot(x2 - x1, y2 - y1))
 		self.keys = (result >= self.thrashold).astype(int)
+		self.keys[0] *= -1
+		self.keys[2] *= -1
 
 	def mutate(self, copies, diversity):
 		agents = []
 		for i in range(copies):
 			agent = AgenticWrestler()
-			agent.network.mutate(diversity)
+			agent.network = self.network.mutate(diversity)
 			agents.append(agent)
 		return agents
 

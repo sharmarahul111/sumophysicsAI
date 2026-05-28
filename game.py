@@ -7,7 +7,7 @@ class Game(Circle):
 		# setting up the playground
 		x = WINDOW_WIDTH/2
 		y = WINDOW_HEIGHT/2
-		radius = min(x, y) * .98 # leave some margin for playground
+		radius = min(x, y) * .8 # leave some margin for playground
 		super().__init__(x, y, radius, BLUE)
 
 		self.players = players
@@ -17,8 +17,8 @@ class Game(Circle):
 		self.j = 1
 		self.timer = 0
 
-		self.players[self.i].pos = self.pos - Vector(200, 0)
-		self.players[self.j].pos = self.pos + Vector(200, 0)
+		self.players[self.i].pos = self.pos - Vector(100, 0)
+		self.players[self.j].pos = self.pos + Vector(100, 0)
 
 	def next_match(self):
 		# setting up players
@@ -30,8 +30,13 @@ class Game(Circle):
 		else:
 			self.j += 1
 
-		self.players[self.i].pos = self.pos - Vector(200, 0)
-		self.players[self.j].pos = self.pos + Vector(200, 0)
+		self.players[self.i].pos = self.pos - Vector(100, 0)
+		self.players[self.j].pos = self.pos + Vector(100, 0)
+		self.players[self.i].vel = Vector(0,0)
+		self.players[self.i].acc = Vector(0,0)
+
+		self.players[self.j].vel = Vector(0,0)
+		self.players[self.j].acc = Vector(0,0)
 
 			
 
@@ -42,10 +47,10 @@ class Game(Circle):
 			print(len(self.players), i, j)
 			raise "Player indices not available"
 		
-		self.players[i].update()
 		self.players[i].opponent = self.players[j]
-		self.players[j].update()
 		self.players[j].opponent = self.players[i]
+		self.players[i].update()
+		self.players[j].update()
 		if self.check_gameover():
 			self.next_match()
 
@@ -59,7 +64,7 @@ class Game(Circle):
 		[i,j] = [self.i, self.j]
 		player1_out = (self.pos - self.players[i].pos).mag() > self.radius-self.border - self.players[i].radius
 		player2_out = (self.pos - self.players[j].pos).mag() > self.radius-self.border - self.players[j].radius
-		if player1_out or player2_out or self.timer % (60*10)==0:
+		if player1_out or player2_out or self.timer % (80*5)==0:
 			if player2_out and not player1_out:
 				self.players[i].score += 10
 				self.players[j].score -= 10
@@ -67,9 +72,9 @@ class Game(Circle):
 				self.players[i].score -= 10
 				self.players[j].score += 10
 
-			if self.timer % (60*5):
-				self.players[i].score -= 5
-				self.players[j].score -= 5
+			if self.timer % (80*5) == 0:
+				self.players[i].score -= 50
+				self.players[j].score -= 50
 
 			self.timer = 0
 			return True
@@ -80,7 +85,9 @@ class Game(Circle):
 		topk: list[AgenticWrestler] = sorted(self.players, key=lambda player: player.score, reverse=True)[:2]
 		self.players = []
 		for player in topk:
-			self.players += player.mutate(2, diversity=.01)
+			self.players += player.mutate(4, diversity=.05)
+			# self.players += player.mutate(2, diversity=.2)
+			self.players += [AgenticWrestler() for _ in range(1)]
 		self.players += topk
 		self.generation += 1
 		self.i = 0
