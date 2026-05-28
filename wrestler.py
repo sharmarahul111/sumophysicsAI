@@ -1,10 +1,6 @@
 from settings import *
-class Wrestler:
-	def __init__(self, x, y, radius):
-		self.x = x
-		self.y = y
-		self.radius = radius
-		self.color = YELLOW
+from circle import Circle
 
-	def draw(self):
-		draw_circle(int(self.x), int(self.y), self.radius, self.color)
+class Wrestler(Circle):
+	def __init__(self, x, y, radius):
+		super().__init__(x, y, radius, YELLOW)
