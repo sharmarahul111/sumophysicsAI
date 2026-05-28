@@ -51,7 +51,7 @@ class Network():
 			activation = activation @ self.layers[i].weights + self.layers[i].biases
 			activation = self.tanh(activation)
 		activation = activation @ self.layers[-1].weights + self.layers[-1].biases
-		activation = self.sigmoid(activation)
+		activation = self.tanh(activation)
 		return activation
 
 	def mutate(self, diversity=.1):

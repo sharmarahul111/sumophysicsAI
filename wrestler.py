@@ -13,8 +13,8 @@ class Wrestler(Circle):
 		self.acc = Vector(0, 0)
 		self.border = .1 # drawing border
 		self.score = 0
-		self.accelaration = .5
-		self.friction = .03
+		self.accelaration = 2
+		self.friction = .015
 		self.keys = [0,0,0,0] # left/right/up/down
 
 	def control(self):
@@ -54,7 +54,7 @@ class DummyWrestler(Wrestler):
 class AgenticWrestler(Wrestler):
 	def __init__(self, x=0, y=0):
 		super().__init__(x, y)
-		self.network = Network(8, 10 , 4)
+		self.network = Network(8, 10 , 2)
 		self.opponent: AgenticWrestler = None
 		self.thrashold = .5
 	
@@ -71,15 +71,16 @@ class AgenticWrestler(Wrestler):
 			x2 = WINDOW_WIDTH/2
 			y2 = WINDOW_HEIGHT/2
 			vx, vy = 0, 0
+
 		result = self.network.forward(np.array([
 			x1/WINDOW_WIDTH,
 			y1/WINDOW_HEIGHT,
 			(x2-x1)/WINDOW_WIDTH,
 			(y2-y1)/WINDOW_HEIGHT,
-			self.vel.x/40,
-			self.vel.y/40,
-			vx/40,
-			vy/40
+			self.vel.x/15,
+			self.vel.y/15,
+			vx/15,
+			vy/15
 		] + noise))
 
 		# reward self being closer to center and punish for opponent being closer to center
@@ -93,19 +94,25 @@ class AgenticWrestler(Wrestler):
 		pressure = Vector.dot(self.vel, to_opp)
 		self.score += pressure * 0.05
 
-		# reward impact
-		normal = (self.opponent.pos - self.pos).unit()
-		relative_vel = self.vel - self.opponent.vel
-		impact = Vector.dot(relative_vel, normal)
-		self.score += max(impact, 0) * 2
 		
 		# penalty for idling
 		if self.vel.mag() < 0.2:
 			self.score -= 0.05
 
-		self.keys = result*10 + .3
+		return result # [ax, ay]
 
+	def update(self):
+		[ax, ay] = self.control() # get controls
+		self.acc.x = ax * self.accelaration
+		self.acc.y = ay * self.accelaration
+		self.vel += self.acc
+		self.vel *= 1-self.friction
+		self.pos += self.vel
 
+		MAX_SPEED = 15
+
+		if self.vel.mag() > MAX_SPEED:
+			self.vel = self.vel.unit() * MAX_SPEED
 
 	def mutate(self, copies, diversity):
 		agents = []
