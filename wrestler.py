@@ -4,13 +4,15 @@ from vector import Vector
 from network import Network
 import numpy as np
 
+
 class Wrestler(Circle):
-	def __init__(self, x, y, radius):
+	def __init__(self, x, y, radius=50):
 		super().__init__(x, y, radius, YELLOW)
 		self.vel = Vector(0, 0)
 		self.acc = Vector(0, 0)
 		self.border = .1 # drawing border
-		self.accelaration = 1
+		self.score = 0
+		self.accelaration = .1
 		self.friction = .08
 		self.keys = [0,0,0,0] # left/right/up/down
 
@@ -38,8 +40,8 @@ class Wrestler(Circle):
 
 	def update(self):
 		self.control() # get controls
-		self.acc.x = self.keys[0] + self.keys[1]
-		self.acc.y = self.keys[2] + self.keys[3]
+		self.acc.x = (self.keys[0] + self.keys[1])*self.accelaration
+		self.acc.y = (self.keys[2] + self.keys[3])*self.accelaration
 		self.vel += self.acc
 		self.vel *= 1-self.friction
 		self.pos += self.vel
@@ -49,8 +51,8 @@ class DummyWrestler(Wrestler):
 		pass
 
 class AgenticWrestler(Wrestler):
-	def __init__(self, x, y, radius):
-		super().__init__(x, y, radius)
+	def __init__(self, x=0, y=0):
+		super().__init__(x, y)
 		self.network = Network(4, 4 , 4)
 		self.opponent: AgenticWrestler = None
 		self.thrashold = .5
@@ -69,8 +71,6 @@ class AgenticWrestler(Wrestler):
 		]))
 
 		self.keys = (result >= self.thrashold).astype(int)
-		print(result)
-		print(self.keys)
 
 def check_collision(w1: Wrestler, w2: Wrestler):
 	dist = (w1.pos - w2.pos).mag()
