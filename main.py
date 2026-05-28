@@ -13,9 +13,7 @@ while not window_should_close():
 	wrestler1.update()
 	wrestler2.update()
 	if check_collision(wrestler1, wrestler2):
-		print("collision!!!")
-	else:
-		print("no collision")
+		resolve_penetration(wrestler1, wrestler2)
 	begin_drawing()
 	clear_background((55, 55, 55))
 	game.draw()

@@ -49,3 +49,10 @@ def check_collision(w1: Wrestler, w2: Wrestler):
 	dist = (w1.pos - w2.pos).mag()
 	if w1.radius + w2.radius > dist:
 		return True
+
+def resolve_penetration(w1: Wrestler, w2: Wrestler):
+	dist = (w1.pos - w2.pos)
+	penetration_depth = w1.radius + w2.radius - dist.mag()
+	penetration_resolution = dist.unit()*(penetration_depth/2)
+	w1.pos += penetration_resolution
+	w2.pos -= penetration_resolution
