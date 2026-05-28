@@ -41,3 +41,11 @@ class Wrestler(Circle):
 		self.vel += self.acc
 		self.vel *= 1-self.friction
 		self.pos += self.vel
+
+class DummyWrestler(Wrestler):
+	def control(self):
+		pass
+def check_collision(w1: Wrestler, w2: Wrestler):
+	dist = (w1.pos - w2.pos).mag()
+	if w1.radius + w2.radius > dist:
+		return True
