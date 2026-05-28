@@ -22,7 +22,7 @@ while not window_should_close():
 	# stats
 	min_score = min(game.players, key=lambda player: player.score).score
 	max_score = max(game.players, key=lambda player: player.score).score
-	print(min_score, max_score)
+	# print(min_score, max_score)
 	for i in range(len(game.players)):
 		score = game.players[i].score
 		if score == min_score:
@@ -31,6 +31,8 @@ while not window_should_close():
 			draw_text(f"Score {i}: { score: .3f}", WINDOW_WIDTH - 250, i*30+30, 20, GREEN)
 		else:
 			draw_text(f"Score {i}: { score: .3f}", WINDOW_WIDTH - 250, i*30+30, 20, WHITE)
+		if game.players[i].past_champion:
+			draw_text("*", WINDOW_WIDTH - 265, i*30+30,25, GREEN)
 	end_drawing()
 
 close_window()

@@ -100,9 +100,10 @@ class Game(Circle):
 		for top in topk:
 			# resetting scores
 			top.score = 0
+			top.past_champion = True
 		self.players = []
 		for player in topk:
-			self.players += player.mutate(3, diversity=.05)
+			self.players += player.mutate(3, diversity=.01)
 			# self.players += player.mutate(1, diversity=.2)
 			self.players += [AgenticWrestler() for _ in range(1)]
 		self.players += topk

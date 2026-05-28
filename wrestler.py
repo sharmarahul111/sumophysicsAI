@@ -56,7 +56,7 @@ class AgenticWrestler(Wrestler):
 		super().__init__(x, y)
 		self.network = Network(8, 10 , 2)
 		self.opponent: AgenticWrestler = None
-		self.thrashold = .5
+		self.past_champion = False
 	
 	def control(self):
 		noise = np.random.normal(0, 0.01, 8)
