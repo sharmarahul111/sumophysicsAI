@@ -1,12 +1,15 @@
-from pyray import *
-
-WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
-
+from settings import *
+from wrestler import Wrestler
 
 init_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Sumo Physics AI")
+set_target_fps(60)
+
+wrestler = Wrestler(300, 400, 50)
+
 while not window_should_close():
 	begin_drawing()
-	draw_circle(300, 300, 100, YELLOW)
+	clear_background((55, 55, 55))
+	wrestler.draw()
 	end_drawing()
 
 close_window()
