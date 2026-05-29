@@ -5,7 +5,7 @@ At first I was skeptical of my AI agents. By looking at their playing style amon
 
 ## Here is a video of Human (me) vs the 28th gen AI
 
-<video src="./media/Human-vs-AI.mp4" autoplay muted loop controls style="max-width: 100%;">
+<video src="https://github.com/user-attachments/assets/46941d63-e3fc-4ae3-bc47-b87a7502dfce" autoplay muted loop controls>
 </video>
 
 <br/>
@@ -13,11 +13,11 @@ At first I was skeptical of my AI agents. By looking at their playing style amon
 ### Here is a video of various AI agents fighting with each other
 
 NOTE: _the * before the score means those agents are the past generation champions_
-<video src="./media/SumoPhysicsAI.mp4" autoplay muted loop controlsstyle="max-width: 100%;">
+<video src="https://github.com/user-attachments/assets/5108661b-dd2d-4eb6-895d-9981403194c2" autoplay muted loop controls>
 </video>
 
 ## 36th Gen AI learned to not go out of circle
-<video src="./media/AI-VS-AI-36.mp4" autoplay muted loop controlsstyle="max-width: 100%;">
+<video src="https://github.com/user-attachments/assets/b2841f56-842d-4111-b8e3-b02a646d6571" autoplay muted loop controls>
 </video>
 
 
