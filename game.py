@@ -55,7 +55,6 @@ class Game(Circle):
 		self.players[self.j].update()
 		if self.check_gameover():
 			self.next_match()
-		print(len(self.players), self.i, self.j, i, j)
 		if check_collision(self.players[self.i], self.players[self.j]):
 			# reward impact
 			normal = (self.players[self.j].pos - self.players[self.i].pos).unit()
@@ -87,11 +86,11 @@ class Game(Circle):
 				self_dist = (self.players[self.i].pos - self.pos).mag()
 				opp_dist = (self.players[self.j].pos - self.pos).mag()
 				if self_dist < opp_dist:
-					self.players[self.i].score += 500
-					self.players[self.j].score -= 500
+					self.players[self.i].score += 100
+					self.players[self.j].score -= 100
 				else:
-					self.players[self.i].score -= 500
-					self.players[self.j].score += 500
+					self.players[self.i].score -= 100
+					self.players[self.j].score += 100
 					
 
 			self.timer = 0

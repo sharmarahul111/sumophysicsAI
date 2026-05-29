@@ -81,7 +81,7 @@ class AgenticWrestler(Wrestler):
 			self.vel.y/15,
 			vx/15,
 			vy/15
-		] + noise))
+		]) + noise)
 
 		# reward self being closer to center and punish for opponent being closer to center
 		center = Vector(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
@@ -89,10 +89,11 @@ class AgenticWrestler(Wrestler):
 		opp_dist = (self.opponent.pos - center).mag()
 		self.score += (opp_dist - self_dist) * 0.1
 
-		# reward forward pressure
+		# reward forward pressure with edge danger
 		to_opp = (self.opponent.pos - self.pos).unit()
 		pressure = Vector.dot(self.vel, to_opp)
-		self.score += pressure * 0.02
+		edge_danger = self_dist / ARENA_RADIUS
+		self.score += pressure * (1 - edge_danger) * 0.02
 
 		# penalty for spiraling
 		tangent = to_opp.normal()
