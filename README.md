@@ -6,4 +6,4 @@ I don't really know if they will learn to play the game, but I am enjoying addin
 
 
 NOTE: the * before the score means those agents are the past generation champions
-![Screenshot](screenshot.png)
+![Screenshot](media/screenshot.png)
