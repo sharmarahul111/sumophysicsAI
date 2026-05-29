@@ -1,6 +1,7 @@
 from settings import *
 from wrestler import *
 from game import Game
+from save import save_agents
 
 init_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Sumo Physics AI")
 set_target_fps(FPS)
@@ -12,6 +13,11 @@ game = Game(players)
 while not window_should_close():
 	# updating
 	game.update()
+
+	if is_key_down(KEY_S):
+		save_agents(game.players[-4])
+		close_window()
+		exit()
 
 	# drawing
 	begin_drawing()
@@ -26,13 +32,13 @@ while not window_should_close():
 	for i in range(len(game.players)):
 		score = game.players[i].score
 		if score == min_score:
-			draw_text(f"Score {i}: { score: .3f}", WINDOW_WIDTH - 250, i*30+30, 20, RED)
+			draw_text(f"Score {i}: { score: .3f}", WINDOW_WIDTH - 250, i*28+30, 20, RED)
 		elif score == max_score:
-			draw_text(f"Score {i}: { score: .3f}", WINDOW_WIDTH - 250, i*30+30, 20, GREEN)
+			draw_text(f"Score {i}: { score: .3f}", WINDOW_WIDTH - 250, i*28+30, 20, GREEN)
 		else:
-			draw_text(f"Score {i}: { score: .3f}", WINDOW_WIDTH - 250, i*30+30, 20, WHITE)
+			draw_text(f"Score {i}: { score: .3f}", WINDOW_WIDTH - 250, i*28+30, 20, WHITE)
 		if game.players[i].past_champion:
-			draw_text("*", WINDOW_WIDTH - 265, i*30+30,25, GREEN)
+			draw_text("*", WINDOW_WIDTH - 265, i*28+30,25, GREEN)
 	end_drawing()
 
 close_window()
