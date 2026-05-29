@@ -103,6 +103,9 @@ class AgenticWrestler(Wrestler):
 		if self.vel.mag() < 0.2:
 			self.score -= 0.05
 
+		# penalty for going away from both opponent and center
+		
+
 		return result # [ax, ay]
 
 	def update(self):

@@ -62,6 +62,10 @@ class Game(Circle):
 			self.players[i].score += max(impact, 0) * 2
 			self.players[j].score += min(-impact, 0) * 2
 
+			# reward for contact
+			self.players[i].score += 0.2
+			self.players[j].score += 0.2
+
 			resolve_penetration(self.players[i], self.players[j])
 			collision_resolution(self.players[i], self.players[j])
 		
@@ -71,23 +75,23 @@ class Game(Circle):
 		[i,j] = [self.i, self.j]
 		player1_out = (self.pos - self.players[i].pos).mag() > self.radius-self.border - self.players[i].radius
 		player2_out = (self.pos - self.players[j].pos).mag() > self.radius-self.border - self.players[j].radius
-		if player1_out or player2_out or self.timer % (FPS*2)==0:
+		if player1_out or player2_out or self.timer >= FPS*2:
 			if player2_out and not player1_out:
-				self.players[i].score += 1000
-				self.players[j].score -= 1000
+				self.players[i].score += 2500
+				self.players[j].score -= 2500
 			if player1_out and not player2_out:
-				self.players[i].score -= 1000
-				self.players[j].score += 1000
+				self.players[i].score -= 2500
+				self.players[j].score += 2500
 
-			if self.timer % (FPS*2) == 0:
+			if self.timer >= (FPS*2):
 				self_dist = (self.players[i].pos - self.pos).mag()
 				opp_dist = (self.players[j].pos - self.pos).mag()
 				if self_dist < opp_dist:
-					self.players[i].score += 20
-					self.players[j].score -= 20
+					self.players[i].score += 500
+					self.players[j].score -= 500
 				else:
-					self.players[i].score -= 20
-					self.players[j].score += 20
+					self.players[i].score -= 500
+					self.players[j].score += 500
 					
 
 			self.timer = 0
