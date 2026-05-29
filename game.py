@@ -1,13 +1,14 @@
 from settings import *
 from circle import Circle
 from wrestler import *
+from random import random
 
 class Game(Circle):
 	def __init__(self, players: Wrestler):
 		# setting up the playground
 		x = WINDOW_WIDTH/2
 		y = WINDOW_HEIGHT/2
-		radius = min(x, y) * .8 # leave some margin for playground
+		radius = ARENA_RADIUS
 		super().__init__(x, y, radius, BLUE)
 
 		self.players = players
@@ -30,8 +31,10 @@ class Game(Circle):
 		else:
 			self.j += 1
 
-		self.players[self.i].pos = self.pos - Vector(100, 0)
-		self.players[self.j].pos = self.pos + Vector(100, 0)
+		angle = random() * math.pi * 2
+		offset = Vector(math.cos(angle), math.sin(angle)) * 100
+		self.players[self.i].pos = self.pos - offset
+		self.players[self.j].pos = self.pos + offset
 		self.players[self.i].vel = Vector(0,0)
 		self.players[self.i].acc = Vector(0,0)
 
@@ -42,56 +45,53 @@ class Game(Circle):
 
 
 	def update(self):
-		[i,j] = [self.i, self.j]
-		if not (self.players[i] and self.players[j]):
+		if not (self.players[self.i] and self.players[self.j]):
 			print(len(self.players), i, j)
 			raise "Player indices not available"
 		
-		self.players[i].opponent = self.players[j]
-		self.players[j].opponent = self.players[i]
-		self.players[i].update()
-		self.players[j].update()
+		self.players[self.i].opponent = self.players[self.j]
+		self.players[self.j].opponent = self.players[self.i]
+		self.players[self.i].update()
+		self.players[self.j].update()
 		if self.check_gameover():
 			self.next_match()
-
-		if check_collision(self.players[i], self.players[j]):
+		print(len(self.players), self.i, self.j, i, j)
+		if check_collision(self.players[self.i], self.players[self.j]):
 			# reward impact
-			normal = (self.players[j].pos - self.players[i].pos).unit()
-			relative_vel = self.players[j].vel - self.players[i].vel
+			normal = (self.players[self.j].pos - self.players[self.i].pos).unit()
+			relative_vel = self.players[self.j].vel - self.players[self.i].vel
 			impact = Vector.dot(relative_vel, normal)
-			self.players[i].score += max(impact, 0) * 2
-			self.players[j].score += min(-impact, 0) * 2
+			self.players[self.i].score += max(impact, 0) * 2
+			self.players[self.j].score += min(-impact, 0) * 2
 
-			# reward for contact
-			self.players[i].score += 0.2
-			self.players[j].score += 0.2
-
-			resolve_penetration(self.players[i], self.players[j])
-			collision_resolution(self.players[i], self.players[j])
+			resolve_penetration(self.players[self.i], self.players[self.j])
+			collision_resolution(self.players[self.i], self.players[self.j])
 		
+		# survival tax
+		self.players[self.i].score -= 0.01
+		self.players[self.j].score -= 0.01
 		self.timer += 1
 
 	def check_gameover(self):
-		[i,j] = [self.i, self.j]
-		player1_out = (self.pos - self.players[i].pos).mag() > self.radius-self.border - self.players[i].radius
-		player2_out = (self.pos - self.players[j].pos).mag() > self.radius-self.border - self.players[j].radius
+		player1_out = (self.pos - self.players[self.i].pos).mag() > self.radius-self.border - self.players[self.i].radius
+		player2_out = (self.pos - self.players[self.j].pos).mag() > self.radius-self.border - self.players[self.j].radius
 		if player1_out or player2_out or self.timer >= FPS*2:
 			if player2_out and not player1_out:
-				self.players[i].score += 2500
-				self.players[j].score -= 2500
+				self.players[self.i].score += 2500
+				self.players[self.j].score -= 2500
 			if player1_out and not player2_out:
-				self.players[i].score -= 2500
-				self.players[j].score += 2500
+				self.players[self.i].score -= 2500
+				self.players[self.j].score += 2500
 
 			if self.timer >= (FPS*2):
-				self_dist = (self.players[i].pos - self.pos).mag()
-				opp_dist = (self.players[j].pos - self.pos).mag()
+				self_dist = (self.players[self.i].pos - self.pos).mag()
+				opp_dist = (self.players[self.j].pos - self.pos).mag()
 				if self_dist < opp_dist:
-					self.players[i].score += 500
-					self.players[j].score -= 500
+					self.players[self.i].score += 500
+					self.players[self.j].score -= 500
 				else:
-					self.players[i].score -= 500
-					self.players[j].score += 500
+					self.players[self.i].score -= 500
+					self.players[self.j].score += 500
 					
 
 			self.timer = 0
@@ -106,8 +106,9 @@ class Game(Circle):
 			top.score = 0
 			top.past_champion = True
 		self.players = []
+		diversity = max(0.2 * (0.99 ** self.generation), 0.01)
 		for player in topk:
-			self.players += player.mutate(3, diversity=.01)
+			self.players += player.mutate(3, diversity=diversity)
 			# self.players += player.mutate(1, diversity=.2)
 			self.players += [AgenticWrestler() for _ in range(1)]
 		self.players += topk
