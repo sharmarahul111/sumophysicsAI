@@ -14,10 +14,11 @@ while not window_should_close():
 	# updating
 	game.update()
 
-	if is_key_down(KEY_S):
+	if is_key_pressed(KEY_S):
 		save_agents(game.players[-4])
-		close_window()
-		exit()
+		print("Saved previous top agent!")
+		# close_window()
+		# exit()
 
 	# drawing
 	begin_drawing()
