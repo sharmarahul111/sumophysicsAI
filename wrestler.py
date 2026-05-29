@@ -54,7 +54,7 @@ class DummyWrestler(Wrestler):
 class AgenticWrestler(Wrestler):
 	def __init__(self, x=0, y=0):
 		super().__init__(x, y)
-		self.network = Network(8, 10 , 2)
+		self.network = Network(8, 8 , 2)
 		self.opponent: AgenticWrestler = None
 		self.past_champion = False
 	
@@ -73,10 +73,10 @@ class AgenticWrestler(Wrestler):
 			vx, vy = 0, 0
 
 		result = self.network.forward(np.array([
-			x1/WINDOW_WIDTH,
-			y1/WINDOW_HEIGHT,
-			(x2-x1)/WINDOW_WIDTH,
-			(y2-y1)/WINDOW_HEIGHT,
+			x1/ARENA_RADIUS,
+			y1/ARENA_RADIUS,
+			(x2-x1)/ARENA_RADIUS,
+			(y2-y1)/ARENA_RADIUS,
 			self.vel.x/15,
 			self.vel.y/15,
 			vx/15,
@@ -87,12 +87,12 @@ class AgenticWrestler(Wrestler):
 		center = Vector(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
 		self_dist = (self.pos - center).mag()
 		opp_dist = (self.opponent.pos - center).mag()
-		self.score += (opp_dist - self_dist) * 0.03
+		self.score += (opp_dist - self_dist) * 0.1
 
 		# reward forward pressure
 		to_opp = (self.opponent.pos - self.pos).unit()
 		pressure = Vector.dot(self.vel, to_opp)
-		self.score += pressure * 0.05
+		self.score += pressure * 0.02
 
 		# penalty for spiraling
 		tangent = to_opp.normal()
